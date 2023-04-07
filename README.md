@@ -45,3 +45,10 @@ Therefore, for example, a commit message is something like ```feat: add multiple
 - PEP8 for code style
 - Sphinx to generate Readme
 - GitHub Flow for how to add features to code (branching, merging etc.) (link an example of its use in Readme)
+
+# Package Management
+Use `poetry`
+
+First time you cloned the repo or whenever the package dependencies in the toml file is updated, run `poetry install`.
+
+For adding package, use `poetry add`.
