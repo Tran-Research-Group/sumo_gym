@@ -2,16 +2,25 @@
 Gym environments for SUMO Traffic simulator
 
 ## Project Structure
-Follow this structure as an example.
+Follow the structure below.
 ```
-poetry-demo
+sumo_gym
 ├── pyproject.toml
+├── poetry.lock
 ├── README.md
-├── poetry_demo
-│   └── __init__.py
+├── sumo_gym
+│       └── __init__.py
 └── tests
-    └── __init__.py
+│       └── __init__.py
+│       └── test_<class/function name>.py
+└── scripts
 ```
+## Package Management
+Use `poetry`
+
+First time you cloned the repo or whenever the package dependencies in the toml file is updated, run `poetry install`.
+
+For adding package, use `poetry add`. `poetry.lock` is automatically generated, so there is no need to edit it.
 
 ## Git
 ### Branching
@@ -49,9 +58,3 @@ Therefore, for example, a commit message is something like ```feat: add multiple
 - Sphinx to generate Readme
 - GitHub Flow for how to add features to code (branching, merging etc.) (link an example of its use in Readme)
 
-## Package Management
-Use `poetry`
-
-First time you cloned the repo or whenever the package dependencies in the toml file is updated, run `poetry install`.
-
-For adding package, use `poetry add`.
