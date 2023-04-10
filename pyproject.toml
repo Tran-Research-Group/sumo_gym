@@ -10,6 +10,7 @@ packages = [{include = "sumo_gym"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 gymnasium = "^0.28.1"
+traci = "^1.16.0"
 
 
 [tool.poetry.group.dev.dependencies]
