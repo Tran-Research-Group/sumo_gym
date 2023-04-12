@@ -1,0 +1,9 @@
+<edges>
+    <edge from="l" id="ltoc" to="c" speed="15.64" />
+    <edge from="c" id="ctor" to="r" speed="15.64" />
+    <edge from="d" id="dtoc" to="c" speed="8.94" />
+    <edge from="c" id="ctol" to="l" speed="15.64" />
+    <edge from="r" id="rtoc" to="c" speed="15.64" />
+    <edge from="c" id="ctod" to="d" speed="8.94" />
+    <edge from="c" id="ctosl" to="sl" speed="15.64" />
+</edges>
