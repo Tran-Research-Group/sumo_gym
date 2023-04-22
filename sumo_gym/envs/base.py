@@ -23,7 +23,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
         config_path: str,
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
-        render: bool = False,
+        is_gui_rendered: bool = False,
     ) -> None:
         """
         Initialize the environment.
@@ -59,13 +59,13 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self._max_steps: int = max_steps
         self._config_path: str = config_path
         self._sumo_binary: str = sumo_binary
-        self._render: bool = render
+        self._is_gui_rendered: bool = is_gui_rendered
 
         self.action_space: gym.Space = spaces.Discrete(self._num_actions)
         self.observation_space: gym.Space = self._create_observation_space()
 
         self._sumo_cmd: list[str]
-        if render:
+        if is_gui_rendered:
             self._sumo_cmd = [sumo_gui_binary, "-c", self._config_path]
         else:
             self._sumo_cmd = [
