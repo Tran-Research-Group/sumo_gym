@@ -1,11 +1,12 @@
 import os, sys
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Final
 
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 import traci
+import traci.constants as tc
 
 from sumo_gym.envs.types import InfoDict, ObsDict
 
@@ -21,6 +22,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
         num_actions: int,
         max_steps: int,
         config_path: str,
+        sumo_options: list[str],
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
         is_gui_rendered: bool = False,
@@ -54,19 +56,26 @@ class BaseSumoGymEnv(gym.Env, ABC):
                 "[sumo_gym] Please declare environment variable 'SUMO_HOME'"
             )
 
-        self._num_veh: int = num_veh
-        self._num_actions: int = num_actions
-        self._max_steps: int = max_steps
-        self._config_path: str = config_path
-        self._sumo_binary: str = sumo_binary
-        self._is_gui_rendered: bool = is_gui_rendered
+        self._num_veh: Final[int] = num_veh
+        self._num_actions: Final[int] = num_actions
+        self._max_steps: Final[int] = max_steps
+        self._config_path: Final[str] = config_path
+        self._sumo_options: Final[list[str]] = sumo_options
+        self._sumo_gui_binary: Final[str] = sumo_gui_binary
+        self._sumo_binary: Final[str] = sumo_binary
+        self._is_gui_rendered: Final[bool] = is_gui_rendered
+        self._reset_counter: int = 0
 
         self.action_space: gym.Space = spaces.Discrete(self._num_actions)
         self.observation_space: gym.Space = self._create_observation_space()
 
         self._sumo_cmd: list[str]
         if is_gui_rendered:
-            self._sumo_cmd = [sumo_gui_binary, "-c", self._config_path]
+            self._sumo_cmd = (
+                [sumo_gui_binary, "-c", self._config_path]
+                + sumo_options
+                + ["--start", "--quit-on-end"]
+            )
         else:
             self._sumo_cmd = [
                 sumo_binary,
@@ -74,7 +83,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
                 self._config_path,
                 "--no-step-log",
                 "true",
-            ]
+            ] + sumo_options
 
     @abstractmethod
     def _create_observation_space(self) -> gym.Space:
@@ -125,6 +134,26 @@ class BaseSumoGymEnv(gym.Env, ABC):
         ...
 
     @abstractmethod
+    def _reset_vehicle(self) -> None:
+        """
+        Reset the vehicle. This method needs be implemented in the child class.
+
+        Parameters
+        -----------
+        None
+
+        Returns
+        --------
+        None
+        """
+        traci.vehicle.subscribeContext(
+            "ego",
+            tc.CMD_GET_VEHICLE_VARIABLE,
+            200,
+            [tc.VAR_SPEED, tc.VAR_ANGLE, tc.VAR_POSITION],
+        )
+        traci.vehicle.setSpeedMode("ego", 32)
+
     def reset(
         self, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[ObsDict, InfoDict]:
@@ -147,9 +176,21 @@ class BaseSumoGymEnv(gym.Env, ABC):
         """
         super().reset(seed=seed, options=options)
 
+        if self._reset_counter > 0:
+            self.close()
+        else:
+            pass
+
         self._step_count: int = 0
+        self._reset_counter += 1
 
         traci.start(self._sumo_cmd)
+        self._reset_vehicle()
+        traci.simulationStep()
+        traci.simulation.saveState("sumoInitState.xml")
+        sub: dict[str, dict] = traci.vehicle.getContextSubscriptionResults("ego")
+        self.vars: list[str] = list(sub["ego"].keys())
+        self._ego_collided: bool = False
 
         observation: ObsDict = self._get_obs()
         info: InfoDict = self._get_info()
@@ -226,3 +267,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
         None
         """
         ...
+
+    def close(self) -> None:
+        traci.close()
