@@ -22,8 +22,12 @@ class BaseSumoGymEnv(gym.Env, ABC):
         max_steps: int,
         config_path: str,
         sumo_options: list[str],
+        ego_aware_dist: float = 100.0,
+        ego_speed_mode: int = 32,
+        vehicle_var_ids: list[int] = [tc.VAR_SPEED, tc.VAR_ANGLE, tc.VAR_POSITION],
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
+        sumo_init_state_save_path: str = "out/sumoInitState.xml",
         is_gui_rendered: bool = False,
     ) -> None:
         """
@@ -39,6 +43,14 @@ class BaseSumoGymEnv(gym.Env, ABC):
             The maximum number of steps the agent can take in the environment.
         config_path: str
             The path to the SUMO configuration file.
+        sumo_options: list[str]
+            The list of SUMO options.
+        ego_aware_dist: float
+            The distance in meters that the ego vehicle is aware of.
+        ego_speed_mode: int
+            The speed mode of the ego vehicle.
+        vehicle_var_ids: list[int]
+            The list of vehicle variable IDs to obtain.
         sumo_gui_binary: str
             The path to the SUMO GUI binary.
         sumo_binary: str
@@ -59,8 +71,12 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self._max_steps: Final[int] = max_steps
         self._config_path: Final[str] = config_path
         self._sumo_options: Final[list[str]] = sumo_options
+        self._ego_aware_dist: Final[float] = ego_aware_dist
+        self._ego_speed_mode: Final[int] = ego_speed_mode
+        self._vehicle_var_ids: Final[list[int]] = vehicle_var_ids
         self._sumo_gui_binary: Final[str] = sumo_gui_binary
         self._sumo_binary: Final[str] = sumo_binary
+        self._sumo_init_state_save_path: Final[str] = sumo_init_state_save_path
         self._is_gui_rendered: Final[bool] = is_gui_rendered
         self._reset_counter: int = 0
 
@@ -131,27 +147,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
         """
         ...
 
-    @abstractmethod
-    def _reset_vehicle(self) -> None:
-        """
-        Reset the vehicle. This method needs be implemented in the child class.
-
-        Parameters
-        -----------
-        None
-
-        Returns
-        --------
-        None
-        """
-        traci.vehicle.subscribeContext(
-            "ego",
-            tc.CMD_GET_VEHICLE_VARIABLE,
-            200,
-            [tc.VAR_SPEED, tc.VAR_ANGLE, tc.VAR_POSITION],
-        )
-        traci.vehicle.setSpeedMode("ego", 32)
-
     def reset(
         self, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[ObsDict, InfoDict]:
@@ -183,9 +178,17 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self._reset_counter += 1
 
         traci.start(self._sumo_cmd)
-        self._reset_vehicle()
+
+        traci.vehicle.subscribeContext(
+            "ego",
+            tc.CMD_GET_VEHICLE_VARIABLE,
+            self._ego_aware_dist,
+            self._vehicle_var_ids,
+        )
+        traci.vehicle.setSpeedMode("ego", self._ego_speed_mode)
+
         traci.simulationStep()
-        traci.simulation.saveState("sumoInitState.xml")
+        traci.simulation.saveState(self._sumo_init_state_save_path)
         sub: dict[str, dict] = traci.vehicle.getContextSubscriptionResults("ego")
         self.vars: list[str] = list(sub["ego"].keys())
         self._ego_collided: bool = False
