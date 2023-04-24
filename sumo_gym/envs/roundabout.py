@@ -122,11 +122,18 @@ class RoundaboutEnv(BaseSumoGymEnv):
         )
 
         info: InfoDict = {
-            "ego_t0_dist": np.array(ego_t0_dist),
-            "ego_t1_dist": np.array(ego_t1_dist),
+            "ego_t0_dist": ego_t0_dist,
+            "ego_t1_dist": ego_t1_dist,
+            "ego_collided": self._ego_collided,
         }
 
         return info
 
     def _act(self, action: int) -> None:
         traci.vehicle.setSpeed("ego", action)
+
+    def _terminate(self) -> bool:
+        terminated: bool = "ego" in traci.simulation.getCollidingVehiclesIDList()
+        self._ego_collided = terminated
+
+        return terminated
