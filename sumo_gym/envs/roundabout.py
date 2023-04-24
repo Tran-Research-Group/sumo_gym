@@ -113,11 +113,12 @@ class RoundaboutEnv(BaseSumoGymEnv):
         return observation
 
     def _get_info(self) -> InfoDict:
+        pos_key: str = self.vars[0]
         ego_t0_dist = np.linalg.norm(
-            self.state_dict["ego"]["pos"] - self.state_dict["t_0"]["pos"]
+            self.state_dict["ego"][pos_key] - self.state_dict["t_0"][pos_key]
         )
         ego_t1_dist = np.linalg.norm(
-            self.state_dict["ego"]["pos"] - self.state_dict["t_1"]["pos"]
+            self.state_dict["ego"][pos_key] - self.state_dict["t_1"][pos_key]
         )
 
         info: InfoDict = {
