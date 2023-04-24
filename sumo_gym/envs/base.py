@@ -189,9 +189,9 @@ class BaseSumoGymEnv(gym.Env, ABC):
 
         traci.simulationStep()
         traci.simulation.saveState(self._sumo_init_state_save_path)
-        self.state_dict: dict[str, dict] = traci.vehicle.getContextSubscriptionResults(
-            "ego"
-        )
+        self.state_dict: dict[
+            str, dict[str, Any]
+        ] = traci.vehicle.getContextSubscriptionResults("ego")
         self.vars: list[str] = list(self.state_dict["ego"].keys())
         self._ego_collided: bool = False
 
