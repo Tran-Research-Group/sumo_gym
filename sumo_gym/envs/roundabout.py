@@ -25,7 +25,6 @@ class RoundaboutEnv(BaseSumoGymEnv):
         sumo_options: list[str],
         ego_aware_dist: float = 100.0,
         ego_speed_mode: int = 32,
-        vehicle_var_ids: list[int] = [tc.VAR_SPEED, tc.VAR_POSITION],
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
         sumo_init_state_save_path: str = "out/sumoInitState.xml",
@@ -56,6 +55,7 @@ class RoundaboutEnv(BaseSumoGymEnv):
         None
 
         """
+        vehicle_var_ids: list[int] = [tc.VAR_SPEED, tc.VAR_POSITION]
         super().__init__(
             num_actions,
             max_steps,
