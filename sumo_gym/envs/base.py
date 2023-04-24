@@ -194,8 +194,10 @@ class BaseSumoGymEnv(gym.Env, ABC):
         ] = traci.vehicle.getContextSubscriptionResults("ego")
         self.vars: list[str] = list(self.state_dict["ego"].keys())
         self._ego_collided: bool = False
+        self._ego_arrived_destination: bool = False
 
         observation: ObsDict = self._get_obs()
+        self.observation: ObsDict = observation
         info: InfoDict = self._get_info()
 
         return observation, info
@@ -235,10 +237,11 @@ class BaseSumoGymEnv(gym.Env, ABC):
         else:
             pass
 
+        observation: ObsDict = self._get_obs()
+        self.observation = observation
+        info: InfoDict = self._get_info()
         reward: float = self._reward()
         terminated: bool = self._terminate()
-        observation: ObsDict = self._get_obs()
-        info: InfoDict = self._get_info()
 
         return observation, reward, terminated, truncated, info
 
