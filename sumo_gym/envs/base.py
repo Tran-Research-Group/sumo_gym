@@ -189,8 +189,10 @@ class BaseSumoGymEnv(gym.Env, ABC):
 
         traci.simulationStep()
         traci.simulation.saveState(self._sumo_init_state_save_path)
-        sub: dict[str, dict] = traci.vehicle.getContextSubscriptionResults("ego")
-        self.vars: list[str] = list(sub["ego"].keys())
+        self.state_dict: dict[str, dict] = traci.vehicle.getContextSubscriptionResults(
+            "ego"
+        )
+        self.vars: list[str] = list(self.state_dict["ego"].keys())
         self._ego_collided: bool = False
 
         observation: ObsDict = self._get_obs()
@@ -198,7 +200,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
 
         return observation, info
 
-    @abstractmethod
     def step(self, action: int) -> tuple[ObsDict, float, bool, bool, InfoDict]:
         """
         Step the environment. This method needs be implemented in the child class.
@@ -222,20 +223,40 @@ class BaseSumoGymEnv(gym.Env, ABC):
             The info of the environment.
         """
         traci.simulationStep()
+        self._act(action)
+        self.state_dict = traci.vehicle.getContextSubscriptionResults("ego")
+
         self._step_count += 1
 
         terminated: bool = False
         truncated: bool = False
         if self._step_count >= self._max_steps:
-            terminated = True
+            truncated = True
         else:
             pass
 
         reward: float = self._reward()
+        terminated: bool = self._terminate()
         observation: ObsDict = self._get_obs()
         info: InfoDict = self._get_info()
 
         return observation, reward, terminated, truncated, info
+
+    @abstractmethod
+    def _act(self, action: int) -> None:
+        """
+        Act the environment. This method needs be implemented in the child class.
+
+        Parameters
+        -----------
+        action: int
+            The action to take.
+
+        Returns
+        --------
+        None
+        """
+        ...
 
     @abstractmethod
     def _reward(self) -> float:
@@ -250,6 +271,22 @@ class BaseSumoGymEnv(gym.Env, ABC):
         --------
         reward: float
             The reward from the environment.
+        """
+        ...
+
+    @abstractmethod
+    def _terminate(self) -> bool:
+        """
+        Get whether the episode has terminated. This method needs be implemented in the child class.
+
+        Parameters
+        -----------
+        None
+
+        Returns
+        --------
+        terminated: bool
+            Whether the episode has terminated.
         """
         ...
 
