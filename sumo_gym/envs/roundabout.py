@@ -1,9 +1,14 @@
+from typing import Any, TypedDict
+
 import numpy as np
+from numpy import ndarray
 import gymnasium as gym
 from gymnasium import spaces
 import traci
+import traci.constants as tc
 
 from sumo_gym.envs.base import BaseSumoGymEnv
+
 from sumo_gym.envs.types import InfoDict, ObsDict
 
 
@@ -14,13 +19,17 @@ class RoundaboutEnv(BaseSumoGymEnv):
 
     def __init__(
         self,
-        num_veh: int,
         num_actions: int,
         max_steps: int,
         config_path: str,
+        sumo_options: list[str],
+        ego_aware_dist: float = 100.0,
+        ego_speed_mode: int = 32,
+        vehicle_var_ids: list[int] = [tc.VAR_SPEED, tc.VAR_POSITION],
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
-        render: bool = False,
+        sumo_init_state_save_path: str = "out/sumoInitState.xml",
+        is_gui_rendered: bool = False,
     ) -> None:
         """
         Initialize the environment.
@@ -48,11 +57,75 @@ class RoundaboutEnv(BaseSumoGymEnv):
 
         """
         super().__init__(
-            num_veh,
             num_actions,
             max_steps,
             config_path,
+            sumo_options,
+            ego_aware_dist,
+            ego_speed_mode,
+            vehicle_var_ids,
             sumo_gui_binary,
             sumo_binary,
-            render,
+            sumo_init_state_save_path,
+            is_gui_rendered,
         )
+
+    def _create_observation_space(self) -> gym.Space:
+        observation_space = spaces.Dict(
+            {
+                "ego_speed": spaces.Box(
+                    low=0.0, high=30.0, shape=(1,), dtype=np.float32
+                ),
+                "ego_pos": spaces.Box(
+                    low=0.0, high=100.0, shape=(2,), dtype=np.float32
+                ),
+                "t_0_speed": spaces.Box(
+                    low=0.0, high=30.0, shape=(1,), dtype=np.float32
+                ),
+                "t_0_pos": spaces.Box(
+                    low=0.0, high=100.0, shape=(2,), dtype=np.float32
+                ),
+                "t_1_speed": spaces.Box(
+                    low=0.0, high=30.0, shape=(1,), dtype=np.float32
+                ),
+                "t_1_pos": spaces.Box(
+                    low=0.0, high=100.0, shape=(2,), dtype=np.float32
+                ),
+            }
+        )
+
+        return observation_space
+
+    def _get_obs(self) -> ObsDict:
+        state_dict: dict[str, dict[str, Any]] = self.state_dict
+
+        observation = {}
+
+        for vehicle in self.state_dict:
+            pos = np.array(state_dict[vehicle][self.vars[0]])
+            vel = np.array(state_dict[vehicle][self.vars[1]])
+            pos_key: str = vehicle + "_pos"
+            vel_key: str = vehicle + "_speed"
+
+            observation[pos_key] = pos
+            observation[vel_key] = vel
+
+        return observation
+
+    def _get_info(self) -> InfoDict:
+        ego_t0_dist = np.linalg.norm(
+            self.state_dict["ego"]["pos"] - self.state_dict["t_0"]["pos"]
+        )
+        ego_t1_dist = np.linalg.norm(
+            self.state_dict["ego"]["pos"] - self.state_dict["t_1"]["pos"]
+        )
+
+        info: InfoDict = {
+            "ego_t0_dist": np.array(ego_t0_dist),
+            "ego_t1_dist": np.array(ego_t1_dist),
+        }
+
+        return info
+
+    def _act(self, action: int) -> None:
+        traci.vehicle.setSpeed("ego", action)
