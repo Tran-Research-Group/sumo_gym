@@ -21,7 +21,16 @@ class RoundaboutEnv(BaseSumoGymEnv):
         num_actions: int,
         max_steps: int,
         config_path: str,
-        sumo_options: list[str],
+        sumo_options: list[str] = [
+            "--step-length",
+            "0.1",
+            "--collision.check-junctions",
+            "true",
+            "--collision.action",
+            "warn",
+            "--emergencydecel.warning-threshold",
+            "1000.1",
+        ],
         max_ego_speed: float = 10.0,  # m/s
         ego_aware_dist: float = 100.0,
         ego_speed_mode: int = 32,
