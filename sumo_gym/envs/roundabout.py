@@ -1,7 +1,6 @@
-from typing import Any, TypedDict
+from typing import Any, Final, TypedDict
 
 import numpy as np
-from numpy import ndarray
 import gymnasium as gym
 from gymnasium import spaces
 import traci
@@ -23,6 +22,7 @@ class RoundaboutEnv(BaseSumoGymEnv):
         max_steps: int,
         config_path: str,
         sumo_options: list[str],
+        max_ego_speed: float = 10.0,  # m/s
         ego_aware_dist: float = 100.0,
         ego_speed_mode: int = 32,
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
@@ -56,6 +56,7 @@ class RoundaboutEnv(BaseSumoGymEnv):
 
         """
         vehicle_var_ids: list[int] = [tc.VAR_SPEED, tc.VAR_POSITION]
+        self._max_ego_speed: Final[float] = max_ego_speed
         super().__init__(
             num_actions,
             max_steps,
@@ -130,10 +131,31 @@ class RoundaboutEnv(BaseSumoGymEnv):
         return info
 
     def _act(self, action: int) -> None:
-        traci.vehicle.setSpeed("ego", action)
+        traci.vehicle.setSpeed(
+            "ego", np.linspace(0.0, self._max_ego_speed, self._num_actions)[action]
+        )
 
     def _terminate(self) -> bool:
-        terminated: bool = "ego" in traci.simulation.getCollidingVehiclesIDList()
-        self._ego_collided = terminated
+        terminated: bool = self._ego_collided or self._ego_arrived_destination
 
         return terminated
+
+    def _reward(self) -> float:
+        reward: float = 0.0
+
+        destination_x: float = -52.0
+
+        self._ego_collided = "ego" in traci.simulation.getCollidingVehiclesIDList()
+
+        if self._ego_collided:
+            reward = -1.0
+        else:
+            pass
+
+        if self.observation["ego_pos"][0] < destination_x:
+            reward = 1.0
+            self._ego_arrived_destination = True
+        else:
+            pass
+
+        return reward
