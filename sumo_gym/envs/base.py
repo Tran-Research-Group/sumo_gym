@@ -18,7 +18,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
 
     def __init__(
         self,
-        num_veh: int,
         num_actions: int,
         max_steps: int,
         config_path: str,
@@ -56,7 +55,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
                 "[sumo_gym] Please declare environment variable 'SUMO_HOME'"
             )
 
-        self._num_veh: Final[int] = num_veh
         self._num_actions: Final[int] = num_actions
         self._max_steps: Final[int] = max_steps
         self._config_path: Final[str] = config_path
@@ -252,13 +250,14 @@ class BaseSumoGymEnv(gym.Env, ABC):
         """
         ...
 
-    @abstractmethod
-    def render(self, mode: str = "human") -> None:
+    def render(self, filename: str | None = None, mode: str = "human") -> None:
         """
         Render the environment. This method needs be implemented in the child class.
 
         Parameters
         -----------
+        filename: str | None
+            The filename to save the rendered environment.
         mode: str
             The mode to render the environment.
 
@@ -266,7 +265,12 @@ class BaseSumoGymEnv(gym.Env, ABC):
         --------
         None
         """
-        ...
+
+        match filename:
+            case None:
+                pass
+            case _:
+                traci.gui.screenshot(traci.gui.DEFAULT_VIEW, filename)
 
     def close(self) -> None:
         traci.close()
