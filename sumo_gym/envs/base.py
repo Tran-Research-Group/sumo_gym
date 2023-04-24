@@ -73,7 +73,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
             sys.path.append(tools)
         else:
             raise NameError(
-                "[sumo_gym] Please declare environment variable 'SUMO_HOME'"
+                "[sumo_gym] Please declare environment variable 'SUMO_HOME'. In Ubuntu, this is done by adding the line 'export SUMO_HOME=/usr/share/sumo' to your ~/.bashrc."
             )
 
         self._num_actions: Final[int] = num_actions
