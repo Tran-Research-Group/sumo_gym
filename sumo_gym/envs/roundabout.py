@@ -33,6 +33,7 @@ class RoundaboutEnv(BaseSumoGymEnv):
         max_ego_speed: float = 10.0,  # m/s
         ego_aware_dist: float = 100.0,
         ego_speed_mode: int = 32,
+        others_speed_mode: int = 32,
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
         sumo_init_state_save_path: str = "out/sumoInitState.xml",
@@ -73,6 +74,7 @@ class RoundaboutEnv(BaseSumoGymEnv):
             sumo_options,
             ego_aware_dist,
             ego_speed_mode,
+            others_speed_mode,
             vehicle_var_ids,
             sumo_gui_binary,
             sumo_binary,
@@ -154,7 +156,7 @@ class RoundaboutEnv(BaseSumoGymEnv):
     def _reward(self) -> float:
         reward: float = 0.0
 
-        destination_x: float = -52.0
+        destination_x: float = -65.0
 
         self._ego_collided = "ego" in traci.simulation.getCollidingVehiclesIDList()
 

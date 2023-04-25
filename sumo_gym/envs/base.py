@@ -32,6 +32,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
         ],
         ego_aware_dist: float = 100.0,
         ego_speed_mode: int = 32,
+        others_speed_mode: int = 32,
         vehicle_var_ids: list[int] = [tc.VAR_SPEED, tc.VAR_ANGLE, tc.VAR_POSITION],
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
@@ -82,6 +83,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self._sumo_options: Final[list[str]] = sumo_options
         self._ego_aware_dist: Final[float] = ego_aware_dist
         self._ego_speed_mode: Final[int] = ego_speed_mode
+        self._others_speed_mode: Final[int] = others_speed_mode
         self._vehicle_var_ids: Final[list[int]] = vehicle_var_ids
         self._sumo_gui_binary: Final[str] = sumo_gui_binary
         self._sumo_binary: Final[str] = sumo_binary
@@ -200,6 +202,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
             self._vehicle_var_ids,
         )
         traci.vehicle.setSpeedMode("ego", self._ego_speed_mode)
+        traci.vehicle.setSpeedMode("t_0", self._others_speed_mode)
 
         traci.simulationStep()
         traci.simulation.saveState(self._sumo_init_state_save_path)
