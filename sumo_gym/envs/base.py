@@ -21,9 +21,8 @@ class BaseSumoGymEnv(gym.Env, ABC):
         num_actions: int,
         max_steps: int,
         config_path: str,
+        step_length: float = 0.1,
         sumo_options: list[str] = [
-            "--step-length",
-            "0.1",
             "--collision.check-junctions",
             "true",
             "--collision.action",
@@ -79,6 +78,7 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self._num_actions: Final[int] = num_actions
         self._max_steps: Final[int] = max_steps
         self._config_path: Final[str] = config_path
+        self._step_length: Final[float] = step_length
         self._sumo_options: Final[list[str]] = sumo_options
         self._ego_aware_dist: Final[float] = ego_aware_dist
         self._ego_speed_mode: Final[int] = ego_speed_mode
@@ -92,12 +92,17 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self.action_space: gym.Space = spaces.Discrete(self._num_actions)
         self.observation_space: gym.Space = self._create_observation_space()
 
+        sumo_all_options: list[str] = [
+            "-c",
+            self._config_path,
+            "--step-length",
+            str(self._step_length),
+        ] + self._sumo_options
+
         self._sumo_cmd: list[str]
         if is_gui_rendered:
             self._sumo_cmd = (
-                [sumo_gui_binary, "-c", self._config_path]
-                + sumo_options
-                + ["--start", "--quit-on-end"]
+                [sumo_gui_binary] + sumo_all_options + ["--start", "--quit-on-end"]
             )
         else:
             self._sumo_cmd = [
