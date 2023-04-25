@@ -112,8 +112,8 @@ class RoundaboutEnv(BaseSumoGymEnv):
         observation = {}
 
         for vehicle in self.state_dict:
-            pos = np.array(state_dict[vehicle][self.vars[0]])
-            vel = np.array(state_dict[vehicle][self.vars[1]])
+            vel = np.array(state_dict[vehicle][self.vars[0]])
+            pos = np.array(state_dict[vehicle][self.vars[1]])
             pos_key: str = vehicle + "_pos"
             vel_key: str = vehicle + "_speed"
 
@@ -123,12 +123,14 @@ class RoundaboutEnv(BaseSumoGymEnv):
         return observation
 
     def _get_info(self) -> InfoDict:
-        pos_key: str = self.vars[0]
+        pos_key: str = self.vars[1]
         ego_t0_dist = np.linalg.norm(
-            self.state_dict["ego"][pos_key] - self.state_dict["t_0"][pos_key]
+            np.array(self.state_dict["ego"][pos_key])
+            - np.array(self.state_dict["t_0"][pos_key])
         )
         ego_t1_dist = np.linalg.norm(
-            self.state_dict["ego"][pos_key] - self.state_dict["t_1"][pos_key]
+            np.array(self.state_dict["ego"][pos_key])
+            - np.array(self.state_dict["t_1"][pos_key])
         )
 
         info: InfoDict = {
