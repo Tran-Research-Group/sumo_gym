@@ -9,10 +9,14 @@ sumo_gym
 ├── poetry.lock
 ├── README.md
 ├── sumo_gym
-│       └── __init__.py
+│      ├── __init__.py
+│      ├── envs                 ... env modules for SUMO
+│      └── config               ... config files for SUMO
+│               ├── t_junction   
+│               └── ...  
 └── tests
-│       └── __init__.py
-│       └── test_<class/function name>.py
+│      └── __init__.py
+│      └── test_<class/function name>.py
 └── scripts
 ```
 ## Package Management
@@ -32,7 +36,7 @@ For example, branching can be done in this way:
 
 ```
 main
-├── dev
+└── dev
        └── feat/av
 ```
 
@@ -55,6 +59,7 @@ Therefore, for example, a commit message is something like ```feat: add multiple
 
 - Numpy docstrings
 - PEP8 for code style
+    - CamelCase for classes, snake_case for file/dir names and functions
 - Sphinx to generate Readme
 - GitHub Flow for how to add features to code (branching, merging etc.) (link an example of its use in Readme)
 
