@@ -202,7 +202,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
             self._vehicle_var_ids,
         )
         traci.vehicle.setSpeedMode("ego", self._ego_speed_mode)
-        traci.vehicle.setSpeedMode("t_0", self._others_speed_mode)
 
         traci.simulationStep()
         traci.simulation.saveState(self._sumo_init_state_save_path)
