@@ -12,11 +12,11 @@ class TestRoundaboutEnv(unittest.TestCase):
             # sumo_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo.exe",
             # sumo_gui_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo-gui.exe",
             is_gui_rendered=True,
-            step_length=1,
+            step_length=0.25,
             ego_aware_dist=200,
         )
         env.reset()
-        for i in range(25):
+        for i in range(50):
             if i == 16:
                 pass
             observation, reward, terminated, truncated, info = env.step(
