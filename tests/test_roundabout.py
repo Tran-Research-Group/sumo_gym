@@ -9,8 +9,8 @@ class TestRoundaboutEnv(unittest.TestCase):
             20,
             300,
             "sumo_gym/config/roundabout/roundabout.sumocfg",
-            sumo_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo.exe",
-            sumo_gui_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo-gui.exe",
+            # sumo_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo.exe",
+            # sumo_gui_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo-gui.exe",
             is_gui_rendered=True,
         )
         env.reset()
