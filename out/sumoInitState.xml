@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2023-04-24 22:04:09 by Eclipse SUMO GUI Version 1.12.0
+<!-- generated on 2023-04-24 22:30:02 by Eclipse SUMO sumo Version 1.12.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
@@ -9,33 +9,25 @@
         <additional-files value="sumo_gym/config/roundabout/roundabout.add.xml"/>
     </input>
 
-    <time>
-        <step-length value="1"/>
-    </time>
-
     <processing>
         <collision.action value="warn"/>
         <collision.check-junctions value="true"/>
         <emergencydecel.warning-threshold value="1000.1"/>
     </processing>
 
-    <traci_server>
-        <remote-port value="50129"/>
-    </traci_server>
+    <report>
+        <no-step-log value="true"/>
+    </report>
 
-    <gui_only>
-        <quit-on-end value="true"/>
-        <start value="true"/>
-        <tracker-interval value="1"/>
-    </gui_only>
+    <traci_server>
+        <remote-port value="58653"/>
+    </traci_server>
 
 </configuration>
 -->
 
 <snapshot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/state_file.xsd" version="1.12.0" time="1.00" type="micro">
-    <route id="!t_0" state="0" edges="-E18 E11"/>
     <route id="!t_0!var#1" state="0" edges="-E18 E15 -E17 E16 E16.32 E10 E10.22 E10.50 E11"/>
-    <route id="!t_1" state="0" edges="-E160 -E130"/>
     <route id="!t_1!var#1" state="0" edges="-E160 E17 -E15 E18 -E14 -E14.29 -E14.72 -E13 -E130"/>
     <route id="r_0" state="1" edges="-E18 E15 -E17 E16 E16.32 E10 E10.22 E10.50 E11"/>
     <route id="r_1" state="1" edges="-E160 E17 -E15 E18 -E14 -E14.29 -E14.72 -E13 -E130"/>
