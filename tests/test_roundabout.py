@@ -8,16 +8,16 @@ class TestRoundaboutEnv(unittest.TestCase):
         env = RoundaboutEnv(
             20,
             300,
-            r"C:\Users\mik09\Development\git\sumo_gym\sumo_gym\config\roundabout\roundabout.sumocfg",  # "./sumo_gym/config/roundabout/roundabout.sumocfg",
+            "sumo_gym/config/roundabout/roundabout.sumocfg",
             sumo_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo.exe",
             sumo_gui_binary=r"C:\Program Files (x86)\Eclipse\Sumo\bin\sumo-gui.exe",
             is_gui_rendered=True,
         )
         env.reset()
-        for _ in range(1000):
+        for i in range(100):
             observation, reward, terminated, truncated, info = env.step(
                 env.action_space.sample()
             )
-            env.render("out/roundabout/test_roundabout_env")
+            env.render(f"out/roundabout/test_roundabout_env_{i}.png")
             if terminated or truncated:
                 break
