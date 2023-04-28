@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "sumo-gym"
+version = "0.1.0"
+description = "Gym environment for SUMO simulator"
+authors = ["Mikihisa Yuasa <mik0915yua@outlook.com>"]
+license = "epl"
+readme = "README.md"
+packages = [{include = "sumo_gym"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+gymnasium = "^0.28.1"
+traci = "^1.16.0"
+numpy = "^1.24.2"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

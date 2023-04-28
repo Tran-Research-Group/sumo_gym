@@ -1,0 +1,15 @@
+<routes>
+    <vType accel="1.0" decel="5.0" carFollowModel="IDM" id="Car" length="2.0" maxSpeed="100.0" sigma="0.0" />
+    <route id="ltod" edges="ltoc ctod"/>
+    <route id="ltor" edges="ltoc ctor"/>
+    <route id="rtol" edges="rtoc ctol"/>
+    <route id="rtod" edges="rtoc ctod"/>
+    <route id="dtol" edges="dtoc ctol"/>
+    <route id="dtor" edges="dtoc ctor"/>
+    <route id="dtosl" edges="dtoc ctosl"/>
+    <flow id="rightdowns" color="1,1,0"  begin="0" end= "7200" probability="0.05" type="Car" route="rtod">
+    </flow>
+    <flow id="leftrights" color="1,0,1"  begin="0" end= "7200" probability="0.1" type="Car" route="ltor">
+    </flow>
+    <vehicle depart="0" id="ego" route="dtol" type="Car" />
+</routes>
