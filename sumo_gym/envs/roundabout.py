@@ -33,7 +33,6 @@ class RoundaboutEnv(BaseSumoGymEnv):
         max_ego_speed: float = 10.0,  # m/s
         ego_aware_dist: float = 100.0,
         ego_speed_mode: int = 32,
-        others_speed_mode: int = 32,
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
         sumo_init_state_save_path: str = "out/sumoInitState.xml",
@@ -74,7 +73,6 @@ class RoundaboutEnv(BaseSumoGymEnv):
             sumo_options,
             ego_aware_dist,
             ego_speed_mode,
-            others_speed_mode,
             vehicle_var_ids,
             sumo_gui_binary,
             sumo_binary,
@@ -107,6 +105,11 @@ class RoundaboutEnv(BaseSumoGymEnv):
         )
 
         return observation_space
+
+    def _create_action_space(self) -> gym.Space:
+        action_space = spaces.Discrete(self._num_actions)
+
+        return action_space
 
     def _get_obs(self) -> ObsDict:
         state_dict: dict[str, dict[str, Any]] = self.state_dict

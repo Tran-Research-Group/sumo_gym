@@ -32,7 +32,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
         ],
         ego_aware_dist: float = 100.0,
         ego_speed_mode: int = 32,
-        others_speed_mode: int = 32,
         vehicle_var_ids: list[int] = [tc.VAR_SPEED, tc.VAR_ANGLE, tc.VAR_POSITION],
         sumo_gui_binary: str = "/usr/bin/sumo-gui",
         sumo_binary: str = "/usr/bin/sumo",
@@ -83,15 +82,14 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self._sumo_options: Final[list[str]] = sumo_options
         self._ego_aware_dist: Final[float] = ego_aware_dist
         self._ego_speed_mode: Final[int] = ego_speed_mode
-        self._others_speed_mode: Final[int] = others_speed_mode
         self._vehicle_var_ids: Final[list[int]] = vehicle_var_ids
         self._sumo_gui_binary: Final[str] = sumo_gui_binary
         self._sumo_binary: Final[str] = sumo_binary
         self._sumo_init_state_save_path: Final[str] = sumo_init_state_save_path
         self._is_gui_rendered: Final[bool] = is_gui_rendered
-        self._reset_counter: int = 0
+        self._reset_count: bool = False
 
-        self.action_space: gym.Space = spaces.Discrete(self._num_actions)
+        self.action_space: gym.Space = self._create_action_space()
         self.observation_space: gym.Space = self._create_observation_space()
 
         sumo_all_options: list[str] = [
@@ -128,6 +126,22 @@ class BaseSumoGymEnv(gym.Env, ABC):
         --------
         observation_space: gym.Space
             The observation space.
+        """
+        ...
+
+    @abstractmethod
+    def _create_action_space(self) -> gym.Space:
+        """
+        Create the action space. This method needs be implemented in the child class.
+
+        Parameters
+        -----------
+        None
+
+        Returns
+        --------
+        action_space: gym.Space
+            The action space.
         """
         ...
 
@@ -185,13 +199,13 @@ class BaseSumoGymEnv(gym.Env, ABC):
         """
         super().reset(seed=seed, options=options)
 
-        if self._reset_counter > 0:
+        if self._reset_counter:
             self.close()
         else:
+            self._reset_count = True
             pass
 
         self._step_count: int = 0
-        self._reset_counter += 1
 
         traci.start(self._sumo_cmd)
 
@@ -208,7 +222,6 @@ class BaseSumoGymEnv(gym.Env, ABC):
         self.state_dict: dict[
             str, dict[str, Any]
         ] = traci.vehicle.getContextSubscriptionResults("ego")
-        self.vars: list[str] = list(self.state_dict["ego"].keys())
         self._ego_collided: bool = False
         self._ego_arrived_destination: bool = False
 
@@ -240,8 +253,9 @@ class BaseSumoGymEnv(gym.Env, ABC):
         info: InfoDict
             The info of the environment.
         """
-        traci.simulationStep()
         self._act(action)
+        traci.simulationStep()
+
         self.state_dict = traci.vehicle.getContextSubscriptionResults("ego")
 
         self._step_count += 1
