@@ -8,6 +8,7 @@ sumo_gym
 ├── pyproject.toml
 ├── poetry.lock
 ├── README.md
+├── Docs
 ├── sumo_gym
 │      ├── __init__.py
 │      ├── envs                 ... env modules for SUMO
@@ -15,9 +16,9 @@ sumo_gym
 │               ├── t_junction   
 │               └── ...  
 └── tests
-│      └── __init__.py
-│      └── test_<class/function name>.py
-└── scripts
+       └── __init__.py
+       └── test_<class/function name>.py
+
 ```
 ## Package Management
 Use `poetry`
